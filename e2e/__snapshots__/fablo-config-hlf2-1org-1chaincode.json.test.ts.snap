@@ -2334,6 +2334,8 @@ exports[`samples/fablo-config-hlf2-1org-1chaincode.json should create proper e2e
 # phrase \\"\${CA_CERT_PARAMS[@]+\\"\${CA_CERT_PARAMS[@]}\\"}\\" is needed in older bash versions ( <4 ) for array expansion.
 # see: https://stackoverflow.com/questions/7577052/bash-empty-array-expansion-with-set-u
 
+source chaincode-function-v1.4.sh
+
 dockerPullIfMissing() {
   local IMAGE=\\"$1\\"
   if [[ \\"$(docker images -q \\"$IMAGE\\" 2>/dev/null)\\" == \\"\\" ]]; then
@@ -2380,11 +2382,8 @@ chaincodeBuild() {
     fi
 
     NODE_VERSION=\\"$(node --version)\\"
-
-    USES_OLD_FABRIC_SHIM=\\"$(jq '.dependencies.\\"fabric-shim\\" | contains(\\"1.4.\\")' \\"$CHAINCODE_DIR_PATH/package.json\\")\\"
-    if [ \\"$USES_OLD_FABRIC_SHIM\\" == \\"true\\" ]; then
-      RECOMMENDED_NODE_VERSION=\\"8.9\\"
-    fi
+    fabric_shim_version = $(jq -r '.dependencies.\\"fabric-shim\\"' \\"$CHAINCODE_DIR_PATH/node_modules/fabric-shim/package.json\\")
+    node_version_check \\"$fabric_shim_version\\"
 
     if ! echo \\"$NODE_VERSION\\" | grep -q \\"v$RECOMMENDED_NODE_VERSION\\"; then
       echo \\"Warning: Your Node.js version is $NODE_VERSION, but recommended is $RECOMMENDED_NODE_VERSION)\\"

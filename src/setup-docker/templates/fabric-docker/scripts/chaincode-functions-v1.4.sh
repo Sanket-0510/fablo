@@ -9,6 +9,31 @@ dockerPullIfMissing() {
   fi
 }
 
+node_version_check(){
+    
+    local fabric_shim_version= "$1"
+
+    if [[ "$fabric_shim_version" == *"1.4."* ]]; then
+        nodejs_version=8.9
+
+    elif [[ "$fabric_shim_version" == *"2.2."* || "$fabric_shim_version" == *"2.3."* ]]; then
+        nodejs_version=12.13
+
+    elif [[ "$fabric_shim_version" == *"2.4."* ]]; then
+        nodejs_version=16.16
+
+    elif [[ "$fabric_shim_version" == *"2.5."* ]]; then
+        nodejs_version=18.12
+
+    else
+        echo "Unsupported fabric-shim version: $fabric_shim_version"
+        exit 1
+    fi
+
+    echo "Node.js runtime version based on fabric-shim version $fabric_shim_version is $nodejs_version"
+
+    }
+
 chaincodeBuild() {
   local CHAINCODE_NAME=$1
   local CHAINCODE_LANG=$2
@@ -48,12 +73,9 @@ chaincodeBuild() {
     fi
 
     NODE_VERSION="$(node --version)"
-
-    USES_OLD_FABRIC_SHIM="$(jq '.dependencies."fabric-shim" | contains("1.4.")' "$CHAINCODE_DIR_PATH/package.json")"
-    if [ "$USES_OLD_FABRIC_SHIM" == "true" ]; then
-      RECOMMENDED_NODE_VERSION="8.9"
-    fi
-
+    fabric_shim_version = $(jq -r '.dependencies."fabric-shim"' "$CHAINCODE_DIR_PATH/node_modules/fabric-shim/package.json")
+    node_version_check "$fabric_shim_version"
+    
     if ! echo "$NODE_VERSION" | grep -q "v$RECOMMENDED_NODE_VERSION"; then
       echo "Warning: Your Node.js version is $NODE_VERSION, but recommended is $RECOMMENDED_NODE_VERSION)"
       echo "See: https://github.com/hyperledger/fabric-chaincode-node/blob/main/COMPATIBILITY.md"

@@ -2,14 +2,38 @@
 # phrase "${CA_CERT_PARAMS[@]+"${CA_CERT_PARAMS[@]}"}" is needed in older bash versions ( <4 ) for array expansion.
 # see: https://stackoverflow.com/questions/7577052/bash-empty-array-expansion-with-set-u
 
-source chaincode-function-v1.4.sh
-
 dockerPullIfMissing() {
   local IMAGE="$1"
   if [[ "$(docker images -q "$IMAGE" 2>/dev/null)" == "" ]]; then
     docker pull --platform linux/x86_64 "$IMAGE"
   fi
 }
+
+
+node_version_check(){
+    
+    local fabric_shim_version= "$1"
+
+    if [[ "$fabric_shim_version" == *"1.4."* ]]; then
+        nodejs_version=8.9
+
+    elif [[ "$fabric_shim_version" == *"2.2."* || "$fabric_shim_version" == *"2.3."* ]]; then
+        nodejs_version=12.13
+
+    elif [[ "$fabric_shim_version" == *"2.4."* ]]; then
+        nodejs_version=16.16
+
+    elif [[ "$fabric_shim_version" == *"2.5."* ]]; then
+        nodejs_version=18.12
+
+    else
+        echo "Unsupported fabric-shim version: $fabric_shim_version"
+        exit 1
+    fi
+
+    echo "Node.js runtime version based on fabric-shim version $fabric_shim_version is $nodejs_version"
+
+    }
 
 chaincodeBuild() {
   local CHAINCODE_NAME=$1

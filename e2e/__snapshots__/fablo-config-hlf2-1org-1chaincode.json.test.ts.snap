@@ -86,6 +86,8 @@ Organizations:
           - Host: peer1.org1.example.com
             Port: 7042
 
+
+
 ################################################################################
 #   SECTION: Application
 ################################################################################
@@ -183,6 +185,7 @@ Profiles:
             <<: *ApplicationDefaults
             Organizations:
                 - *Org1
+
 "
 `;
 
@@ -1849,6 +1852,7 @@ services:
     networks:
       - basic
 
+
   cli.orderer.example.com:
     container_name: cli.orderer.example.com
     image: hyperledger/fabric-tools:\${FABRIC_VERSION}
@@ -1874,6 +1878,8 @@ services:
     networks:
       - basic
 
+
+
   orderer0.group1.orderer.example.com:
     container_name: orderer0.group1.orderer.example.com
     image: hyperledger/fabric-orderer:\${FABRIC_VERSION}
@@ -1898,6 +1904,8 @@ services:
     networks:
       - basic
 
+
+
   ca.org1.example.com:
     container_name: ca.org1.example.com
     image: hyperledger/fabric-ca:\${FABRIC_CA_VERSION}
@@ -1916,6 +1924,7 @@ services:
       - ../fabric-config/fabric-ca-server-config/org1.example.com/fabric-ca-server-config.yaml:/etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml
     networks:
       - basic
+
 
   cli.org1.example.com:
     container_name: cli.org1.example.com
@@ -1942,6 +1951,9 @@ services:
       - \\"$CHAINCODES_BASE_DIR/./chaincodes/chaincode-kv-node/:/var/hyperledger/cli/chaincode1/\\"
     networks:
       - basic
+
+
+
 
   peer0.org1.example.com:
     container_name: peer0.org1.example.com
@@ -1974,7 +1986,7 @@ services:
       # enabled gateway
       - CORE_PEER_GATEWAY_ENABLED=true
     working_dir: /etc/hyperledger/fabric/peer/
-    command: peer node start
+    command: peer node start 
     ports:
       - 8041:9440
       - 7041:7041
@@ -2018,7 +2030,7 @@ services:
       # enabled gateway
       - CORE_PEER_GATEWAY_ENABLED=true
     working_dir: /etc/hyperledger/fabric/peer/
-    command: peer node start
+    command: peer node start 
     ports:
       - 8042:9440
       - 7042:7042
@@ -2030,6 +2042,8 @@ services:
       - ../fabric-config/config:/etc/hyperledger/fabric/config
     networks:
       - basic
+
+
 "
 `;
 
@@ -2334,14 +2348,38 @@ exports[`samples/fablo-config-hlf2-1org-1chaincode.json should create proper e2e
 # phrase \\"\${CA_CERT_PARAMS[@]+\\"\${CA_CERT_PARAMS[@]}\\"}\\" is needed in older bash versions ( <4 ) for array expansion.
 # see: https://stackoverflow.com/questions/7577052/bash-empty-array-expansion-with-set-u
 
-source chaincode-function-v1.4.sh
-
 dockerPullIfMissing() {
   local IMAGE=\\"$1\\"
   if [[ \\"$(docker images -q \\"$IMAGE\\" 2>/dev/null)\\" == \\"\\" ]]; then
     docker pull --platform linux/x86_64 \\"$IMAGE\\"
   fi
 }
+
+
+node_version_check(){
+    
+    local fabric_shim_version= \\"$1\\"
+
+    if [[ \\"$fabric_shim_version\\" == *\\"1.4.\\"* ]]; then
+        nodejs_version=8.9
+
+    elif [[ \\"$fabric_shim_version\\" == *\\"2.2.\\"* || \\"$fabric_shim_version\\" == *\\"2.3.\\"* ]]; then
+        nodejs_version=12.13
+
+    elif [[ \\"$fabric_shim_version\\" == *\\"2.4.\\"* ]]; then
+        nodejs_version=16.16
+
+    elif [[ \\"$fabric_shim_version\\" == *\\"2.5.\\"* ]]; then
+        nodejs_version=18.12
+
+    else
+        echo \\"Unsupported fabric-shim version: $fabric_shim_version\\"
+        exit 1
+    fi
+
+    echo \\"Node.js runtime version based on fabric-shim version $fabric_shim_version is $nodejs_version\\"
+
+    }
 
 chaincodeBuild() {
   local CHAINCODE_NAME=$1

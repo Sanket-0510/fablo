@@ -11,7 +11,8 @@ dockerPullIfMissing() {
 
 node_version_check(){
     
-    local fabric_shim_version= "$1"
+    local fabric_shim_version="$1"
+    local nodejs_version
 
     if [[ "$fabric_shim_version" == *"1.4."* ]]; then
         nodejs_version=8.9
@@ -26,13 +27,12 @@ node_version_check(){
         nodejs_version=18.12
 
     else
-        echo "Unsupported fabric-shim version: $fabric_shim_version"
-        exit 1
+        nodejs_version=18.12
     fi
 
-    echo "Node.js runtime version based on fabric-shim version $fabric_shim_version is $nodejs_version"
+    echo $nodejs_version
 
-    }
+}
 
 chaincodeBuild() {
   local CHAINCODE_NAME=$1

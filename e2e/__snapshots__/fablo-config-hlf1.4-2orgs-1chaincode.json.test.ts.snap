@@ -86,7 +86,6 @@ Organizations:
           - Host: peer1.org1.example.com
             Port: 7042
 
-
     - &Org2
       Name: Org2MSP
       ID: Org2MSP
@@ -112,8 +111,6 @@ Organizations:
 
           - Host: peer1.org2.example.com
             Port: 7062
-
-
 
 ################################################################################
 #   SECTION: Application
@@ -236,7 +233,6 @@ Profiles:
             Organizations:
                 - *Org1
                 - *Org2
-
 "
 `;
 
@@ -2635,7 +2631,6 @@ services:
     networks:
       - basic
 
-
   cli.orderer.example.com:
     container_name: cli.orderer.example.com
     image: hyperledger/fabric-tools:\${FABRIC_VERSION}
@@ -2661,8 +2656,6 @@ services:
     networks:
       - basic
 
-
-
   orderer0.group1.orderer.example.com:
     container_name: orderer0.group1.orderer.example.com
     image: hyperledger/fabric-orderer:\${FABRIC_VERSION}
@@ -2687,8 +2680,6 @@ services:
     networks:
       - basic
 
-
-
   ca.org1.example.com:
     container_name: ca.org1.example.com
     image: hyperledger/fabric-ca:\${FABRIC_CA_VERSION}
@@ -2707,7 +2698,6 @@ services:
       - ../fabric-config/fabric-ca-server-config/org1.example.com/fabric-ca-server-config.yaml:/etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml
     networks:
       - basic
-
 
   cli.org1.example.com:
     container_name: cli.org1.example.com
@@ -2734,9 +2724,6 @@ services:
       - \\"$CHAINCODES_BASE_DIR/./chaincodes/chaincode-kv-node-1.4/:/var/hyperledger/cli/chaincode1/\\"
     networks:
       - basic
-
-
-
 
   peer0.org1.example.com:
     container_name: peer0.org1.example.com
@@ -2767,7 +2754,7 @@ services:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - GODEBUG=netdns=go
     working_dir: /etc/hyperledger/fabric/peer/
-    command: peer node start 
+    command: peer node start
     ports:
       - 8041:9440
       - 7041:7041
@@ -2809,7 +2796,7 @@ services:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - GODEBUG=netdns=go
     working_dir: /etc/hyperledger/fabric/peer/
-    command: peer node start 
+    command: peer node start
     ports:
       - 8042:9440
       - 7042:7042
@@ -2821,7 +2808,6 @@ services:
       - ../fabric-config/config:/etc/hyperledger/fabric/config
     networks:
       - basic
-
 
   ca.org2.example.com:
     container_name: ca.org2.example.com
@@ -2841,7 +2827,6 @@ services:
       - ../fabric-config/fabric-ca-server-config/org2.example.com/fabric-ca-server-config.yaml:/etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml
     networks:
       - basic
-
 
   cli.org2.example.com:
     container_name: cli.org2.example.com
@@ -2868,9 +2853,6 @@ services:
       - \\"$CHAINCODES_BASE_DIR/./chaincodes/chaincode-kv-node-1.4/:/var/hyperledger/cli/chaincode1/\\"
     networks:
       - basic
-
-
-
 
   peer0.org2.example.com:
     container_name: peer0.org2.example.com
@@ -2901,7 +2883,7 @@ services:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - GODEBUG=netdns=go
     working_dir: /etc/hyperledger/fabric/peer/
-    command: peer node start 
+    command: peer node start
     ports:
       - 8061:9440
       - 7061:7061
@@ -2943,7 +2925,7 @@ services:
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
       - GODEBUG=netdns=go
     working_dir: /etc/hyperledger/fabric/peer/
-    command: peer node start 
+    command: peer node start
     ports:
       - 8062:9440
       - 7062:7062
@@ -2955,8 +2937,6 @@ services:
       - ../fabric-config/config:/etc/hyperledger/fabric/config
     networks:
       - basic
-
-
 "
 `;
 
@@ -3268,30 +3248,30 @@ dockerPullIfMissing() {
   fi
 }
 
-node_version_check(){
-    
-    local fabric_shim_version= \\"$1\\"
+node_version_check() {
 
-    if [[ \\"$fabric_shim_version\\" == *\\"1.4.\\"* ]]; then
-        nodejs_version=8.9
+  local fabric_shim_version=\\"$1\\"
+  local nodejs_version
 
-    elif [[ \\"$fabric_shim_version\\" == *\\"2.2.\\"* || \\"$fabric_shim_version\\" == *\\"2.3.\\"* ]]; then
-        nodejs_version=12.13
+  if [[ \\"$fabric_shim_version\\" == *\\"1.4.\\"* ]]; then
+    nodejs_version=8.9
 
-    elif [[ \\"$fabric_shim_version\\" == *\\"2.4.\\"* ]]; then
-        nodejs_version=16.16
+  elif [[ \\"$fabric_shim_version\\" == *\\"2.2.\\"* || \\"$fabric_shim_version\\" == *\\"2.3.\\"* ]]; then
+    nodejs_version=12.13
 
-    elif [[ \\"$fabric_shim_version\\" == *\\"2.5.\\"* ]]; then
-        nodejs_version=18.12
+  elif [[ \\"$fabric_shim_version\\" == *\\"2.4.\\"* ]]; then
+    nodejs_version=16.16
 
-    else
-        echo \\"Unsupported fabric-shim version: $fabric_shim_version\\"
-        exit 1
-    fi
+  elif [[ \\"$fabric_shim_version\\" == *\\"2.5.\\"* ]]; then
+    nodejs_version=18.12
 
-    echo \\"Node.js runtime version based on fabric-shim version $fabric_shim_version is $nodejs_version\\"
+  else
+    nodejs_version=18.12
+  fi
 
-    }
+  echo $nodejs_version
+
+}
 
 chaincodeBuild() {
   local CHAINCODE_NAME=$1

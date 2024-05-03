@@ -107,7 +107,6 @@ Organizations:
           - Host: peer1.org1.example.com
             Port: 7062
 
-
     - &Org2
       Name: Org2MSP
       ID: Org2MSP
@@ -133,8 +132,6 @@ Organizations:
 
           - Host: peer1.org2.example.com
             Port: 7082
-
-
 
 ################################################################################
 #   SECTION: Application
@@ -188,7 +185,7 @@ Orderer: &Group1Defaults
 
     BatchTimeout: 2s
     BatchSize:
-        MaxMessageCount: 10
+        MaxMessageCount: 1
         AbsoluteMaxBytes: 99 MB
         PreferredMaxBytes: 512 KB
     Organizations:
@@ -219,7 +216,7 @@ Orderer: &Group2Defaults
         - orderer0.group2.orderer2.com:7050
     BatchTimeout: 2s
     BatchSize:
-        MaxMessageCount: 10
+        MaxMessageCount: 1
         AbsoluteMaxBytes: 99 MB
         PreferredMaxBytes: 512 KB
     Organizations:
@@ -346,7 +343,6 @@ Profiles:
             Organizations:
                 - *Org1
                 - *Org2
-
 "
 `;
 
@@ -3801,7 +3797,6 @@ services:
     networks:
       - basic
 
-
   cli.orderer1.com:
     container_name: cli.orderer1.com
     image: hyperledger/fabric-tools:\${FABRIC_VERSION}
@@ -3839,8 +3834,6 @@ services:
       - \\"$CHAINCODES_BASE_DIR/./chaincodes/chaincode-java-simple/:/var/hyperledger/cli/chaincode2/\\"
     networks:
       - basic
-
-
 
   orderer0.group1.orderer1.com:
     container_name: orderer0.group1.orderer1.com
@@ -3947,8 +3940,6 @@ services:
     networks:
       - basic
 
-
-
   ca.orderer2.com:
     container_name: ca.orderer2.com
     image: hyperledger/fabric-ca:\${FABRIC_CA_VERSION}
@@ -3968,7 +3959,6 @@ services:
       - ../fabric-config/fabric-ca-server-config/orderer2.com/fabric-ca-server-config.yaml:/etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml
     networks:
       - basic
-
 
   cli.orderer2.com:
     container_name: cli.orderer2.com
@@ -4008,8 +3998,6 @@ services:
     networks:
       - basic
 
-
-
   orderer0.group2.orderer2.com:
     container_name: orderer0.group2.orderer2.com
     image: hyperledger/fabric-orderer:\${FABRIC_VERSION}
@@ -4045,8 +4033,6 @@ services:
     networks:
       - basic
 
-
-
   ca.org1.example.com:
     container_name: ca.org1.example.com
     image: hyperledger/fabric-ca:\${FABRIC_CA_VERSION}
@@ -4066,7 +4052,6 @@ services:
       - ../fabric-config/fabric-ca-server-config/org1.example.com/fabric-ca-server-config.yaml:/etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml
     networks:
       - basic
-
 
   cli.org1.example.com:
     container_name: cli.org1.example.com
@@ -4128,8 +4113,6 @@ services:
     networks:
       - basic
 
-
-
   peer0.org1.example.com:
     container_name: peer0.org1.example.com
     image: hyperledger/fabric-peer:\${FABRIC_VERSION}
@@ -4166,7 +4149,7 @@ services:
       # enabled gateway
       - CORE_PEER_GATEWAY_ENABLED=true
     working_dir: /etc/hyperledger/fabric/peer/
-    command: peer node start 
+    command: peer node start
     ports:
       - 8061:9440
       - 7061:7061
@@ -4215,7 +4198,7 @@ services:
       # enabled gateway
       - CORE_PEER_GATEWAY_ENABLED=true
     working_dir: /etc/hyperledger/fabric/peer/
-    command: peer node start 
+    command: peer node start
     ports:
       - 8062:9440
       - 7062:7062
@@ -4227,7 +4210,6 @@ services:
       - ../fabric-config/config:/etc/hyperledger/fabric/config
     networks:
       - basic
-
 
   ca.org2.example.com:
     container_name: ca.org2.example.com
@@ -4248,7 +4230,6 @@ services:
       - ../fabric-config/fabric-ca-server-config/org2.example.com/fabric-ca-server-config.yaml:/etc/hyperledger/fabric-ca-server/fabric-ca-server-config.yaml
     networks:
       - basic
-
 
   cli.org2.example.com:
     container_name: cli.org2.example.com
@@ -4289,9 +4270,6 @@ services:
     networks:
       - basic
 
-
-
-
   peer0.org2.example.com:
     container_name: peer0.org2.example.com
     image: hyperledger/fabric-peer:\${FABRIC_VERSION}
@@ -4328,7 +4306,7 @@ services:
       # enabled gateway
       - CORE_PEER_GATEWAY_ENABLED=true
     working_dir: /etc/hyperledger/fabric/peer/
-    command: peer node start 
+    command: peer node start
     ports:
       - 8081:9440
       - 7081:7081
@@ -4377,7 +4355,7 @@ services:
       # enabled gateway
       - CORE_PEER_GATEWAY_ENABLED=true
     working_dir: /etc/hyperledger/fabric/peer/
-    command: peer node start 
+    command: peer node start
     ports:
       - 8082:9440
       - 7082:7082
@@ -4389,8 +4367,6 @@ services:
       - ../fabric-config/config:/etc/hyperledger/fabric/config
     networks:
       - basic
-
-
 "
 `;
 
@@ -4702,32 +4678,30 @@ dockerPullIfMissing() {
   fi
 }
 
+node_version_check() {
 
-node_version_check(){
-    
-    local fabric_shim_version= \\"$1\\"
+  local fabric_shim_version=\\"$1\\"
+  local nodejs_version
 
-    if [[ \\"$fabric_shim_version\\" == *\\"1.4.\\"* ]]; then
-        nodejs_version=8.9
+  if [[ \\"$fabric_shim_version\\" == *\\"1.4.\\"* ]]; then
+    nodejs_version=8.9
 
-    elif [[ \\"$fabric_shim_version\\" == *\\"2.2.\\"* || \\"$fabric_shim_version\\" == *\\"2.3.\\"* ]]; then
-        nodejs_version=12.13
+  elif [[ \\"$fabric_shim_version\\" == *\\"2.2.\\"* || \\"$fabric_shim_version\\" == *\\"2.3.\\"* ]]; then
+    nodejs_version=12.13
 
-    elif [[ \\"$fabric_shim_version\\" == *\\"2.4.\\"* ]]; then
-        nodejs_version=16.16
+  elif [[ \\"$fabric_shim_version\\" == *\\"2.4.\\"* ]]; then
+    nodejs_version=16.16
 
-    elif [[ \\"$fabric_shim_version\\" == *\\"2.5.\\"* ]]; then
-        nodejs_version=18.12
+  elif [[ \\"$fabric_shim_version\\" == *\\"2.5.\\"* ]]; then
+    nodejs_version=18.12
 
-    else
-        echo \\"Unsupported fabric-shim version: $fabric_shim_version\\"
-        exit 1
-    fi
+  else
+    nodejs_version=18.12
+  fi
 
-    echo \\"Node.js runtime version based on fabric-shim version $fabric_shim_version is $nodejs_version\\"
+  echo $nodejs_version
 
-    }
-
+}
 chaincodeBuild() {
   local CHAINCODE_NAME=$1
   local CHAINCODE_LANG=$2

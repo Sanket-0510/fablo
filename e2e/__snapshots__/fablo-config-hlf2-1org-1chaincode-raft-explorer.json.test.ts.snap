@@ -83,8 +83,6 @@ Organizations:
           - Host: peer0.org1.example.com
             Port: 7041
 
-
-
 ################################################################################
 #   SECTION: Application
 ################################################################################
@@ -125,7 +123,7 @@ Orderer: &Group1Defaults
 
     BatchTimeout: 2s
     BatchSize:
-        MaxMessageCount: 10
+        MaxMessageCount: 1
         AbsoluteMaxBytes: 99 MB
         PreferredMaxBytes: 512 KB
     Organizations:
@@ -189,7 +187,6 @@ Profiles:
             <<: *ApplicationDefaults
             Organizations:
                 - *Org1
-
 "
 `;
 
@@ -1890,7 +1887,6 @@ services:
     networks:
       - basic
 
-
   cli.orderer.example.com:
     container_name: cli.orderer.example.com
     image: hyperledger/fabric-tools:\${FABRIC_VERSION}
@@ -1923,8 +1919,6 @@ services:
       - \\"$CHAINCODES_BASE_DIR/./chaincodes/chaincode-kv-node/:/var/hyperledger/cli/chaincode1/\\"
     networks:
       - basic
-
-
 
   orderer0.group1.orderer.example.com:
     container_name: orderer0.group1.orderer.example.com
@@ -1960,8 +1954,6 @@ services:
       - ../fabric-config/crypto-config/peerOrganizations/orderer.example.com/peers/orderer0.group1.orderer.example.com/tls/:/var/hyperledger/orderer/tls
     networks:
       - basic
-
-
 
   ca.org1.example.com:
     container_name: ca.org1.example.com
@@ -2061,8 +2053,6 @@ services:
     networks:
       - basic
 
-
-
   peer0.org1.example.com:
     container_name: peer0.org1.example.com
     image: hyperledger/fabric-peer:\${FABRIC_VERSION}
@@ -2102,7 +2092,7 @@ services:
       - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=peer0
       - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=peer0Password
     working_dir: /etc/hyperledger/fabric/peer/
-    command: peer node start 
+    command: peer node start
     ports:
       - 8041:9440
       - 7041:7041
@@ -2479,32 +2469,30 @@ dockerPullIfMissing() {
   fi
 }
 
+node_version_check() {
 
-node_version_check(){
-    
-    local fabric_shim_version= \\"$1\\"
+  local fabric_shim_version=\\"$1\\"
+  local nodejs_version
 
-    if [[ \\"$fabric_shim_version\\" == *\\"1.4.\\"* ]]; then
-        nodejs_version=8.9
+  if [[ \\"$fabric_shim_version\\" == *\\"1.4.\\"* ]]; then
+    nodejs_version=8.9
 
-    elif [[ \\"$fabric_shim_version\\" == *\\"2.2.\\"* || \\"$fabric_shim_version\\" == *\\"2.3.\\"* ]]; then
-        nodejs_version=12.13
+  elif [[ \\"$fabric_shim_version\\" == *\\"2.2.\\"* || \\"$fabric_shim_version\\" == *\\"2.3.\\"* ]]; then
+    nodejs_version=12.13
 
-    elif [[ \\"$fabric_shim_version\\" == *\\"2.4.\\"* ]]; then
-        nodejs_version=16.16
+  elif [[ \\"$fabric_shim_version\\" == *\\"2.4.\\"* ]]; then
+    nodejs_version=16.16
 
-    elif [[ \\"$fabric_shim_version\\" == *\\"2.5.\\"* ]]; then
-        nodejs_version=18.12
+  elif [[ \\"$fabric_shim_version\\" == *\\"2.5.\\"* ]]; then
+    nodejs_version=18.12
 
-    else
-        echo \\"Unsupported fabric-shim version: $fabric_shim_version\\"
-        exit 1
-    fi
+  else
+    nodejs_version=18.12
+  fi
 
-    echo \\"Node.js runtime version based on fabric-shim version $fabric_shim_version is $nodejs_version\\"
+  echo $nodejs_version
 
-    }
-
+}
 chaincodeBuild() {
   local CHAINCODE_NAME=$1
   local CHAINCODE_LANG=$2

@@ -33,6 +33,7 @@ node_version_check(){
     echo $nodejs_version
 
 }
+
 chaincodeBuild() {
   local CHAINCODE_NAME=$1
   local CHAINCODE_LANG=$2

@@ -14,7 +14,7 @@ generateArtifacts() {
   <% }) -%>
   <%_ ordererGroups.forEach((ordererGroup) => { _%>
   printItalics "Generating genesis block for group <%= ordererGroup.name %>" "U1F3E0"
-  genesisBlockCreate "$FABLO_NETWORK_ROOT/fabric-config" "$FABLO_NETWORK_ROOT/fabric-config/config" "<%= ordererGroup.profileName %>"
+  # genesisBlockCreate "$FABLO_NETWORK_ROOT/fabric-config" "$FABLO_NETWORK_ROOT/fabric-config/config" "<%= ordererGroup.profileName %>"
 
   <%_ }) _%>
   # Create directory for chaincode packages to avoid permission errors on linux

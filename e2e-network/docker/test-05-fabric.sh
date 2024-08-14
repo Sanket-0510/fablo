@@ -8,7 +8,6 @@ FABLO_HOME="$TEST_TMP/../../.."
 
 CONFIG="$FABLO_HOME/samples/fablo-config-hlf3-1orgs-1chaincode.json"
 
-CONFIG  = "/samples/
 networkUp() {
   "$FABLO_HOME/fablo-build.sh"
   (cd "$TEST_TMP" && "$FABLO_HOME/fablo.sh" generate "$CONFIG")
@@ -24,6 +23,7 @@ dumpLogs() {
 networkDown() {
   rm -rf "$TEST_LOGS"
   (for name in $(docker ps --format '{{.Names}}'); do dumpLogs "$name"; done)
+  dumpLogs orderer0.group1.orderer.example.com
   (cd "$TEST_TMP" && "$FABLO_HOME/fablo.sh" down)
 }
 

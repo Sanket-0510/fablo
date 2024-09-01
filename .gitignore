@@ -1,6 +1,8 @@
 e2e/__tmp__
 e2e-network/*.logs
 e2e-network/*.tmpdir
+test-01-simple.sh.tmpdir
+test-01-simple.sh.logs
 fablo-target
 generators
 node_modules

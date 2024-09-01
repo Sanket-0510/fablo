@@ -14,7 +14,7 @@ generateArtifacts() {
   <% }) -%>
   <%_ ordererGroups.forEach((ordererGroup) => { _%>
   printItalics "Generating genesis block for group <%= ordererGroup.name %>" "U1F3E0"
-  # genesisBlockCreate "$FABLO_NETWORK_ROOT/fabric-config" "$FABLO_NETWORK_ROOT/fabric-config/config" "<%= ordererGroup.profileName %>"
+  genesisBlockCreate "$FABLO_NETWORK_ROOT/fabric-config" "$FABLO_NETWORK_ROOT/fabric-config/config" "<%= ordererGroup.profileName %>"
 
   <%_ }) _%>
   # Create directory for chaincode packages to avoid permission errors on linux
@@ -76,7 +76,7 @@ installChaincodes() {
   <% } else { -%>
     <% chaincodes.forEach((chaincode) => { -%>
       if [ -n "$(ls "$CHAINCODES_BASE_DIR/<%= chaincode.directory %>")" ]; then
-        <% if (global.capabilities.isV2) { -%>
+        <% if (global.capabilities.isV2 || global.capabilities.isV3) { -%>
           <% if (global.peerDevMode) { -%>
             <%- include('commands-generated/chaincode-dev-v2.sh', { chaincode }); -%>
           <% } else { -%>
@@ -102,7 +102,7 @@ installChaincode() {
   <% chaincodes.forEach((chaincode) => { -%>
     if [ "$chaincodeName" = "<%= chaincode.name %>" ]; then
       if [ -n "$(ls "$CHAINCODES_BASE_DIR/<%= chaincode.directory %>")" ]; then
-        <% if (global.capabilities.isV2) { -%>
+        <% if (global.capabilities.isV2 || global.capabilities.isV3) { -%>
           <%- include('commands-generated/chaincode-install-v2.sh', { chaincode, global }); %>
         <% } -%>
       else
@@ -114,7 +114,7 @@ installChaincode() {
 }
 
 runDevModeChaincode() {
-  <% if (!global.capabilities.isV2) { -%>
+  <% if (!global.capabilities.isV2 || global.capabilities.isV3) { -%>
     echo "Running chaincode in dev mode is supported by Fablo only for V2 channel capabilities"
     exit 1
   <% } else { -%>
@@ -140,7 +140,7 @@ upgradeChaincode() {
   <% chaincodes.forEach((chaincode) => { -%>
     if [ "$chaincodeName" = "<%= chaincode.name %>" ]; then
       if [ -n "$(ls "$CHAINCODES_BASE_DIR/<%= chaincode.directory %>")" ]; then
-        <% if (global.capabilities.isV2) { -%>
+        <% if (global.capabilities.isV2 || global.capabilities.isV3) { -%>
           <%- include('commands-generated/chaincode-install-v2.sh', { chaincode, global }); %>
         <% } else { -%>
           <%- include('commands-generated/chaincode-upgrade-v2.sh', { chaincode, global }); %>

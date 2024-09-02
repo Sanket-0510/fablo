@@ -146,6 +146,12 @@ Profiles:
                     - *<%= org.name %>
                   <%_ }) _%>
         <%_ } _%>
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                <%_ orgs.forEach(function(org){ _%>
+                    - *<%= org.name %>
+                <%_ }) _%>
   <%_ }) _%>
 
   <%_ channels.forEach(function(channel) { _%>
@@ -161,12 +167,6 @@ Profiles:
             Capabilities:
                 <<: *ApplicationCapabilities
         Consortium: SampleConsortium
-        Consortiums:
-            SampleConsortium:
-                Organizations:
-                  <%_ channel.orgs.forEach(function(org){ _%>
-                    - *<%= org.name %>
-                  <%_ }) _%>
         Application:
             <<: *ApplicationDefaults
             Organizations:
